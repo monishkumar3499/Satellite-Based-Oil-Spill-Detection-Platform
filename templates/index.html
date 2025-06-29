@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelHub - Advanced Oil Spill Detection & Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Modern Dark Theme Design System */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #1e1e2e;
+            --bg-elevated: #252538;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            
+            --accent-primary: #00d4ff;
+            --accent-secondary: #0ea5e9;
+            --accent-tertiary: #06b6d4;
+            
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --border-accent: #00d4ff33;
+            
+            --glow-primary: 0 0 20px rgba(0, 212, 255, 0.3);
+            --glow-secondary: 0 0 30px rgba(0, 212, 255, 0.2);
+            --glow-strong: 0 0 40px rgba(0, 212, 255, 0.5);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            --font-primary: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'Courier New', Consolas, Monaco, monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+            animation: backgroundPulse 8s ease-in-out infinite;
+            z-index: -2;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, rgba(0, 212, 255, 0.02) 49%, rgba(0, 212, 255, 0.02) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(0, 212, 255, 0.02) 49%, rgba(0, 212, 255, 0.02) 51%, transparent 52%);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            overflow: hidden;
+            animation: loginSlideIn 0.8s ease-out;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+            animation: loginGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes loginSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes loginGlow {
+            from { box-shadow: var(--glow-primary); }
+            to { box-shadow: var(--glow-strong); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: var(--glow-primary);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .login-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 16px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: var(--glow-primary);
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-strong);
+        }
+
+        /* Main App Styles */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .app-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            animation: headerSlideIn 0.6s ease-out;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+            animation: headerGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes headerSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes headerGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .app-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--glow-primary);
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .app-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .logout-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Upload Panel */
+        .upload-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            height: fit-content;
+            position: relative;
+            animation: panelSlideIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes panelSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        .panel-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .upload-section {
+            margin-bottom: 24px;
+        }
+
+        .upload-label {
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+        }
+
+        .upload-zone {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, var(--accent-primary)20, transparent);
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+        }
+
+        .upload-zone:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .upload-zone.uploaded {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .upload-icon {
+            margin-bottom: 16px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover .upload-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .analyze-btn:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-strong);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+            animation: panelSlideIn 0.8s ease-out 0.4s both;
+        }
+
+        /* Ready State */
+        .ready-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 64px 32px;
+            min-height: 600px;
+        }
+
+        .ready-icon {
+            margin-bottom: 32px;
+            opacity: 0.6;
+            animation: readyFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes readyFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+
+        .ready-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .ready-description {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 400px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        /* Results State */
+        .results-state {
+            display: none;
+            padding: 32px;
+            animation: resultsSlideIn 0.6s ease-out;
+        }
+
+        @keyframes resultsSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .results-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* Status Card */
+        .status-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            animation: statusSlideIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes statusSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-main {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .status-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            position: relative;
+            animation: statusIconPop 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes statusIconPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .status-icon.oil-detected {
+            background: linear-gradient(135deg, var(--error), #dc2626);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .status-icon.no-oil {
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+        }
+
+        .status-icon.error {
+            background: linear-gradient(135deg, var(--text-muted), #6b7280);
+            box-shadow: 0 0 30px rgba(107, 114, 128, 0.4);
+        }
+
+        .status-content h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .status-content p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        /* Confidence Meter */
+        .confidence-meter {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            animation: confidenceSlideIn 0.6s ease-out 0.6s both;
+        }
+
+        @keyframes confidenceSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .confidence-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .confidence-label {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .confidence-value {
+            font-size: 20px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--accent-primary);
+        }
+
+        .confidence-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confidence-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            animation: confidenceShine 2s infinite;
+        }
+
+        @keyframes confidenceShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .confidence-high {
+            background: linear-gradient(90deg, var(--success), #16a34a);
+        }
+
+        .confidence-medium {
+            background: linear-gradient(90deg, var(--warning), #d97706);
+        }
+
+        .confidence-low {
+            background: linear-gradient(90deg, var(--error), #dc2626);
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .detail-item {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            border-left: 3px solid var(--accent-primary);
+            animation: detailSlideIn 0.6s ease-out 0.8s both;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-2px);
+            background: var(--bg-tertiary);
+        }
+
+        @keyframes detailSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-item.thickness {
+            border-left-color: var(--success);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.025em;
+        }
+
+        .detail-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            animation: statsSlideIn 0.6s ease-out 1s both;
+        }
+
+        @keyframes statsSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* New Analysis Button */
+        .new-analysis-btn {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: newAnalysisSlideIn 0.6s ease-out 1.2s both;
+        }
+
+        @keyframes newAnalysisSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .new-analysis-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Loading States */
+        .analyzing .status-icon {
+            animation: analyzeRotate 2s linear infinite;
+        }
+
+        @keyframes analyzeRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .upload-panel {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .status-main {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+            
+            .stats-row {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .login-card {
+                padding: 32px 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .upload-zone {
+                padding: 24px 16px;
+            }
+            
+            .ready-state {
+                padding: 48px 24px;
+            }
+            
+            .results-state {
+                padding: 24px 16px;
+            }
+            
+            .status-card {
+                padding: 24px 16px;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus States */
+        .form-input:focus,
+        .login-btn:focus,
+        .analyze-btn:focus,
+        .new-analysis-btn:focus,
+        .logout-btn:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="20" cy="20" r="16"/>
+                        <circle cx="20" cy="20" r="10"/>
+                        <circle cx="20" cy="20" r="4"/>
+                        <path d="M20 4 L20 0 M36 20 L40 20 M20 36 L20 40 M4 20 L0 20"/>
+                    </svg>
+                </div>
+                <h1 class="login-title">SentinelHub</h1>
+                <p class="login-subtitle">Advanced Oil Spill Detection & Analysis Platform</p>
+            </div>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter your username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container" id="mainApp">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo-section">
+                <div class="app-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="6"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <path d="M12 2 L12 0 M22 12 L24 12 M12 22 L12 24 M2 12 L0 12"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="app-title">SentinelHub</h1>
+                    <p class="app-subtitle">Advanced Oil Spill Detection & Analysis</p>
+                </div>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Dr. Sarah Chen</div>
+                    <div class="user-role">Marine Analyst</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Sign Out</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-grid">
+            <!-- Upload Panel -->
+            <div class="upload-panel">
+                <div class="panel-header">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17,8 12,3 7,8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <h2 class="panel-title">Data Upload</h2>
+                </div>
+                <p class="panel-description">Upload SAR satellite imagery and microwave radiometry data for comprehensive oil spill detection and analysis.</p>
+
+                <!-- SAR Image Upload -->
+                <div class="upload-section">
+                    <label class="upload-label">SAR Satellite Image</label>
+                    <div class="upload-zone" id="sarUpload">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="24" cy="24" r="20"/>
+                                <circle cx="24" cy="24" r="12"/>
+                                <circle cx="24" cy="24" r="6"/>
+                            </svg>
+                        </div>
+                        <div class="upload-text" id="sarText">Click to upload or drag SAR image</div>
+                        <input type="file" id="sarFile" accept=".png,.jpg,.jpeg" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Radiometry Data Upload -->
+                <div class="upload-section">
+                    <label class="upload-label">Radiometry Data (CSV)</label>
+                    <div class="upload-zone" id="radioUpload">
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="32" width="4" height="12"/>
+                                <rect x="14" y="26" width="4" height="18"/>
+                                <rect x="22" y="20" width="4" height="24"/>
+                                <rect x="30" y="24" width="4" height="20"/>
+                                <rect x="38" y="28" width="4" height="16"/>
+                            </svg>
+                        </div>
+                        <div class="upload-text" id="radioText">Click to upload or drag CSV file</div>
+                        <input type="file" id="radioFile" accept=".csv,.txt" style="display: none;">
+                    </div>
+                </div>
+
+                <button class="analyze-btn" id="analyzeBtn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21 5,3"/>
+                    </svg>
+                    Run Analysis
+                </button>
+            </div>
+
+            <!-- Analysis Panel -->
+            <div class="analysis-panel">
+                <!-- Ready State -->
+                <div class="ready-state" id="readyState">
+                    <div class="ready-icon">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="60" cy="60" r="50"/>
+                            <circle cx="60" cy="60" r="35"/>
+                            <circle cx="60" cy="60" r="20"/>
+                            <circle cx="60" cy="60" r="8"/>
+                            <path d="M60 10 L60 0 M110 60 L120 60 M60 110 L60 120 M10 60 L0 60"/>
+                            <path d="M95 25 L105 15 M95 95 L105 105 M25 95 L15 105 M25 25 L15 15"/>
+                        </svg>
+                    </div>
+                    <h2 class="ready-title">System Ready</h2>
+                    <p class="ready-description">Upload your SAR satellite imagery and radiometry data to begin comprehensive oil spill detection and environmental analysis.</p>
+                </div>
+
+                <!-- Results State -->
+                <div class="results-state" id="resultsState">
+                    <div class="results-header">
+                        <h2 class="results-title">Analysis Complete</h2>
+                        <p class="results-subtitle">Comprehensive detection results with confidence metrics</p>
+                    </div>
+
+                    <!-- Status Card -->
+                    <div class="status-card">
+                        <div class="status-main">
+                            <div class="status-icon" id="statusIcon">
+                                <span id="statusEmoji">🔍</span>
+                            </div>
+                            <div class="status-content">
+                                <h3 id="statusTitle">Processing...</h3>
+                                <p id="statusDescription">Analyzing satellite imagery and radiometry data...</p>
+                            </div>
+                        </div>
+
+                        <!-- Confidence Meter -->
+                        <div class="confidence-meter">
+                            <div class="confidence-header">
+                                <span class="confidence-label">Detection Confidence</span>
+                                <span class="confidence-value" id="confidenceValue">0%</span>
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Analysis Type</div>
+                            <div class="detail-value" id="analysisType">--</div>
+                            <div class="detail-description" id="analysisReason">Processing comprehensive analysis...</div>
+                        </div>
+
+                        <div class="detail-item thickness" id="thicknessDetail" style="display: none;">
+                            <div class="detail-label">Oil Thickness</div>
+                            <div class="detail-value" id="thicknessValue">--</div>
+                            <div class="detail-description">
+                                <strong>Type:</strong> <span id="oilTypeValue">--</span><br>
+                                <strong>Layer:</strong> <span id="thicknessLayer">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <div class="stat-value" id="processingTime">--</div>
+                            <div class="stat-label">Processing Time</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="imageSize">--</div>
+                            <div class="stat-label">Image Size</div>
+                        </div>
+                    </div>
+
+                    <button class="new-analysis-btn" id="newAnalysisBtn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 2L8 14M2 8L14 8"/>
+                        </svg>
+                        Start New Analysis
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let analysisStartTime;
+        let currentUser = null;
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple validation (in real app, this would be server-side)
+            if (username && password) {
+                currentUser = {
+                    name: username === 'admin' ? 'Dr. Sarah Chen' : username,
+                    role: username === 'admin' ? 'Marine Analyst' : 'Researcher'
+                };
+                
+                document.getElementById('userName').textContent = currentUser.name;
+                document.querySelector('.user-role').textContent = currentUser.role;
+                
+                // Animate transition
+                document.getElementById('loginPage').style.opacity = '0';
+                document.getElementById('loginPage').style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('mainApp').style.display = 'block';
+                }, 300);
+            } else {
+                alert('Please enter both username and password');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('mainApp').style.opacity = '0';
+            document.getElementById('mainApp').style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('loginPage').style.opacity = '1';
+                document.getElementById('loginPage').style.transform = 'translateY(0)';
+                
+                // Reset form
+                document.getElementById('loginForm').reset();
+                currentUser = null;
+            }, 300);
+        });
+
+        // File upload handlers
+        document.getElementById('sarUpload').addEventListener('click', () => {
+            document.getElementById('sarFile').click();
+        });
+
+        document.getElementById('radioUpload').addEventListener('click', () => {
+            document.getElementById('radioFile').click();
+        });
+
+        // Drag and drop functionality
+        ['sarUpload', 'radioUpload'].forEach(id => {
+            const element = document.getElementById(id);
+            
+            element.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                element.style.borderColor = 'var(--accent-primary)';
+                element.style.backgroundColor = 'var(--bg-tertiary)';
+            });
+            
+            element.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                element.style.borderColor = 'var(--border-secondary)';
+                element.style.backgroundColor = 'var(--bg-secondary)';
+            });
+            
+            element.addEventListener('drop', (e) => {
+                e.preventDefault();
+                element.style.borderColor = 'var(--border-secondary)';
+                element.style.backgroundColor = 'var(--bg-secondary)';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const input = element.querySelector('input[type="file"]');
+                    input.files = files;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+
+        document.getElementById('sarFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('sarText').textContent = file.name;
+                this.parentElement.classList.add('uploaded');
+                const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                const imageSizeElement = document.getElementById('imageSize');
+                imageSizeElement.style.transform = 'scale(1.1)';
+                imageSizeElement.textContent = `${sizeInMB} MB`;
+                setTimeout(() => imageSizeElement.style.transform = 'scale(1)', 200);
+            }
+        });
+
+        document.getElementById('radioFile').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('radioText').textContent = file.name;
+                this.parentElement.classList.add('uploaded');
+            }
+        });
+
+        document.getElementById('analyzeBtn').addEventListener('click', function () {
+            const sarFileInput = document.getElementById('sarFile');
+            const radioFileInput = document.getElementById('radioFile');
+
+            if (sarFileInput.files.length === 0 || radioFileInput.files.length === 0) {
+                alert('Please upload both SAR image and radiometry CSV file.');
+                return;
+            }
+
+            analysisStartTime = Date.now();
+            this.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="10" cy="10" r="8"/>
+                    <path d="M10 6V10L13 13"/>
+                </svg>
+                Analyzing...
+            `;
+            this.disabled = true;
+
+            const readyState = document.getElementById('readyState');
+            const resultsState = document.getElementById('resultsState');
+
+            readyState.style.opacity = '0';
+            readyState.style.transform = 'translateY(-20px)';
+
+            setTimeout(() => {
+                readyState.style.display = 'none';
+                resultsState.style.display = 'block';
+                document.getElementById('statusIcon').classList.add('analyzing');
+            }, 300);
+
+            const formData = new FormData();
+            formData.append("image", sarFileInput.files[0]);
+            formData.append("radiometry", radioFileInput.files[0]);
+
+            fetch("/predict", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                const processingTime = ((Date.now() - analysisStartTime) / 1000).toFixed(1);
+                document.getElementById('processingTime').textContent = `${processingTime}s`;
+
+                document.getElementById('statusIcon').classList.remove('analyzing');
+
+                this.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21 5,3"/>
+                    </svg>
+                    Run Analysis
+                `;
+                this.disabled = false;
+
+                if (data.error) {
+                    showResult("Analysis Error", data.error, 0, "error");
+                    return;
+                }
+
+                showResult(
+                    data.prediction,
+                    data.reason,
+                    data.confidence,
+                    data.prediction.toLowerCase().includes("oil") ? "oil-spill" : "no-spill"
+                );
+
+                // Show thickness details if oil is detected
+                if (data.prediction.toLowerCase().includes("oil")) {
+                    document.getElementById("thicknessDetail").style.display = "block";
+                    document.getElementById("thicknessValue").textContent = data.thickness || "Thick layer";
+                    document.getElementById("oilTypeValue").textContent = data.oil_type || "Crude Oil or Emulsified Oil";
+                    document.getElementById("thicknessLayer").textContent = data.thickness || "Thick layer";
+                } else {
+                    document.getElementById("thicknessDetail").style.display = "none";
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('statusIcon').classList.remove('analyzing');
+                showResult("Analysis Failed", "Unable to process the files. Please try again.", 0, "error");
+                this.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21 5,3"/>
+                    </svg>
+                    Run Analysis
+                `;
+                this.disabled = false;
+            });
+        });
+
+        function showResult(prediction, description, confidence, type) {
+            // Update main status
+            document.getElementById("statusTitle").textContent = prediction;
+            document.getElementById("statusDescription").textContent = description;
+            
+            // Update confidence
+            document.getElementById("confidenceValue").textContent = `${confidence}%`;
+            document.getElementById("confidenceFill").style.width = `${confidence}%`;
+            
+            // Update analysis details
+            document.getElementById("analysisType").textContent = prediction;
+            document.getElementById("analysisReason").textContent = description;
+            
+            // Update status icon and styling
+            const statusIcon = document.getElementById("statusIcon");
+            const statusEmoji = document.getElementById("statusEmoji");
+            const confidenceBar = document.getElementById("confidenceFill");
+            
+            if (type === "oil-spill") {
+                statusIcon.className = "status-icon oil-detected";
+                statusEmoji.textContent = "🛢️";
+            } else if (type === "no-spill") {
+                statusIcon.className = "status-icon no-oil";
+                statusEmoji.textContent = "🌊";
+            } else {
+                statusIcon.className = "status-icon error";
+                statusEmoji.textContent = "❌";
+            }
+            
+            // Set confidence bar color based on confidence level
+            if (confidence >= 80) {
+                confidenceBar.className = "confidence-fill confidence-high";
+            } else if (confidence >= 60) {
+                confidenceBar.className = "confidence-fill confidence-medium";
+            } else {
+                confidenceBar.className = "confidence-fill confidence-low";
+            }
+        }
+
+        document.getElementById('newAnalysisBtn').addEventListener('click', function () {
+            const readyState = document.getElementById('readyState');
+            const resultsState = document.getElementById('resultsState');
+            
+            resultsState.style.opacity = '0';
+            resultsState.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                resultsState.style.display = 'none';
+                readyState.style.display = 'flex';
+                readyState.style.opacity = '0';
+                readyState.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    readyState.style.opacity = '1';
+                    readyState.style.transform = 'translateY(0)';
+                }, 50);
+            }, 300);
+            
+            // Reset form
+            document.getElementById("sarFile").value = "";
+            document.getElementById("radioFile").value = "";
+            document.getElementById("sarText").textContent = "Click to upload or drag SAR image";
+            document.getElementById("radioText").textContent = "Click to upload or drag CSV file";
+            document.getElementById("imageSize").textContent = "--";
+            document.getElementById("processingTime").textContent = "--";
+            document.getElementById("sarUpload").classList.remove("uploaded");
+            document.getElementById("radioUpload").classList.remove("uploaded");
+            document.getElementById("thicknessDetail").style.display = "none";
+        });
+    </script>
+</body>
+</html>
