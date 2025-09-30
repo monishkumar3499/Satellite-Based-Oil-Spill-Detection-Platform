@@ -1,30 +1,34 @@
-# 🌊 Oil Spill Detection Platform  
+# 🌊 Oil Spill Detection Platform
 
-An **AI-powered satellite image classifier** using Sentinel-1 SAR data and deep learning for accurate oil spill detection, combined with radiometry-based thickness estimation for oil layers.  
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)](https://www.tensorflow.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.x-green.svg)](https://flask.palletsprojects.com/)
 
----
-
-## ✨ Features  
-✅ Preprocesses Sentinel-1 SAR images (resize, normalize, train/val/test split)  
-✅ Classifies images using a **TensorFlow (Keras) CNN** with convolution, pooling, batch normalization, and dropout layers  
-✅ Provides **oil layer thickness estimation** by analyzing radiometry CSV data  
-✅ Serves predictions through a **Flask API** with real-time inference results  
+An **AI-powered satellite image classifier** using Sentinel-1 SAR data and deep learning for real-time oil spill detection and thickness estimation.
 
 ---
 
-## 🛠 Tech Stack  
-- **Backend & Deep Learning:** Python, TensorFlow (Keras)  
-- **Image Processing:** OpenCV  
-- **ML Utilities:** scikit-learn  
-- **Data Handling:** pandas (for radiometry thickness analysis)  
-- **Web Framework:** Flask  
+## ✨ Key Features
+
+✅ **Smart Detection** – CNN-based classification of oil spills using Sentinel-1 SAR imagery  
+✅ **Thickness Analysis** – Radiometry-based estimation of oil layer thickness  
+✅ **Production Ready** – Flask REST API for real-time predictions  
+✅ **Complete Pipeline** – Preprocessing, training, evaluation, and deployment
 
 ---
 
-## 🚀 Usage  
+## 🛠 Tech Stack
+
+**ML & Vision:** TensorFlow (Keras), OpenCV, scikit-learn  
+**Data Processing:** pandas, NumPy  
+**API:** Flask, Flask-CORS
+
+---
+
+## 🚀 Quick Start
 
 ```bash
-# Clone the repo
+# Clone repository
 git clone https://github.com/monishkumar3499/Satellite-Based-Oil-Spill-Detection-Platform.git
 cd Satellite-Based-Oil-Spill-Detection-Platform
 
@@ -32,7 +36,49 @@ cd Satellite-Based-Oil-Spill-Detection-Platform
 pip install -r requirements.txt
 
 # Train the model
-python train.py
+python train.py --epochs 50 --batch-size 32
 
-# Start the API server
+# Analyze oil thickness
+python thickness_estimator.py --input data/radiometry.csv
+
+# Start API server
 python app.py
+```
+
+---
+
+## 📊 Model Architecture
+
+- **Input:** Sentinel-1 SAR images (224×224)
+- **CNN Layers:** 4 conv blocks with batch normalization + MaxPooling
+- **Regularization:** Dropout (0.5) to prevent overfitting
+- **Output:** Multi-class classification (oil spill, look-alike, clean water)
+
+---
+
+## 🎯 Use Cases
+
+🌍 **Environmental Monitoring** – Track and respond to marine oil spills  
+🚢 **Maritime Safety** – Detect illegal discharge from vessels  
+🏛️ **Regulatory Compliance** – Support enforcement agencies  
+📈 **Research** – Analyze spill patterns and environmental impact
+
+---
+
+## 👨‍💻 Author
+
+**Monish Kumar**  
+📧 Email: [your-email@example.com](mailto:monishkumar3499@gmail.com)  
+🔗 GitHub: [@monishkumar3499](https://github.com/monishkumar3499)
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Please open an issue or submit a pull request.
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/enhancement`)
+3. Commit changes (`git commit -m 'Add new feature'`)
+4. Push to branch (`git push origin feature/enhancement`)
+5. Open Pull Request
